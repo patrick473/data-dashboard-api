@@ -4,6 +4,8 @@ from pathlib import Path
 import pandas as pd
 from fastapi import FastAPI
 
+from routers import data as data_router
+
 DATA_DIR = Path(__file__).parent / "data"
 
 # Keyed by stem filename, e.g. "my_file" for "my_file.csv"
@@ -22,12 +24,11 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+app.include_router(data_router.router)
+
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return "API is working. Visit /docs for API documentation."
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str | None = None):
-    return {"item_id": item_id, "q": q}
