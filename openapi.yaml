@@ -1,0 +1,224 @@
+openapi: 3.1.0
+info:
+  title: Data Dashboard API
+  version: 0.1.0
+  description: >
+    API for serving pre-analyzed CSV data. CSV files are processed offline by
+    `analyze_csv_file.py` and the resulting JSON is stored in `data/`.
+
+paths:
+  /:
+    get:
+      summary: Root
+      operationId: readRoot
+      responses:
+        "200":
+          description: API status message
+          content:
+            application/json:
+              schema:
+                type: string
+              example: "API is working. Visit /docs for API documentation."
+
+  /data/available-files:
+    get:
+      summary: Get available files
+      operationId: getAvailableFiles
+      tags:
+        - data
+      responses:
+        "200":
+          description: List of available file names without extension
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AvailableFiles"
+
+  /data/{filename}:
+    get:
+      summary: Get analysis data
+      operationId: getData
+      tags:
+        - data
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          description: File stem, without extension
+          schema:
+            type: string
+            pattern: "^[A-Za-z0-9_-]+$"
+          example: trein
+      responses:
+        "200":
+          description: Full analysis result for the requested file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisResult"
+        "400":
+          description: Invalid filename
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPError"
+              example:
+                detail: Invalid filename
+        "404":
+          description: File not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPError"
+              example:
+                detail: File not found
+
+components:
+  schemas:
+    AvailableFiles:
+      type: object
+      required:
+        - available_files
+      properties:
+        available_files:
+          type: array
+          items:
+            type: string
+          example:
+            - trein
+
+    HTTPError:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+
+    FileMetadata:
+      type: object
+      required:
+        - name
+        - size_bytes
+      properties:
+        name:
+          type: string
+          example: trein.csv
+        size_bytes:
+          type: integer
+          format: int64
+          example: 2301393736
+
+    DType:
+      type: string
+      enum:
+        - string
+        - numeric
+        - boolean
+        - datetime
+        - categorical
+
+    ColumnStats:
+      type: object
+      required:
+        - name
+        - dtype
+        - null_count
+        - fill_rate
+        - unique_count
+        - top_values
+      properties:
+        name:
+          type: string
+          example: dienstregelpunt
+        dtype:
+          $ref: "#/components/schemas/DType"
+        null_count:
+          type: integer
+          example: 0
+        fill_rate:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          example: 0.9973
+        unique_count:
+          type: integer
+          example: 695
+        top_values:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+          example:
+            - Ut
+            - Ass
+            - Shl
+            - Asd
+            - Rtd
+        min:
+          type:
+            - number
+            - string
+            - "null"
+        max:
+          type:
+            - number
+            - string
+            - "null"
+        mean:
+          type:
+            - number
+            - "null"
+        std:
+          type:
+            - number
+            - "null"
+        median:
+          type:
+            - number
+            - "null"
+
+    AnalysisResult:
+      type: object
+      required:
+        - file
+        - columns
+        - total_rows
+        - total_columns
+        - total_cells
+        - total_nulls
+        - overall_fill_rate
+        - fully_complete_columns
+        - rows_with_any_null
+      properties:
+        file:
+          $ref: "#/components/schemas/FileMetadata"
+        columns:
+          type: array
+          items:
+            $ref: "#/components/schemas/ColumnStats"
+        total_rows:
+          type: integer
+          example: 10000
+        total_columns:
+          type: integer
+          example: 12
+        total_cells:
+          type: integer
+          example: 120000
+        total_nulls:
+          type: integer
+          example: 321
+        overall_fill_rate:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          example: 0.9973
+        fully_complete_columns:
+          type: integer
+          example: 9
+        rows_with_any_null:
+          type: integer
+          example: 215

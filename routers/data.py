@@ -9,6 +9,12 @@ DATA_DIR = Path(__file__).parent.parent / "data"
 router = APIRouter(prefix="/data", tags=["data"])
 
 
+@router.get("/available-files")
+def get_available_files():
+    files = [f.stem for f in DATA_DIR.glob("*.json")]
+    return {"available_files": files}
+
+
 @router.get("/{filename}")
 def get_data(filename: str):
     if not re.fullmatch(r"[\w\-]+", filename):
