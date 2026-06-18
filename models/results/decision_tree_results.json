@@ -1,0 +1,9 @@
+{
+  "model": "Decision Tree",
+  "max_depth": 5,
+  "gemiddelde_vertraging": 0.85,
+  "voorspelling": 0.85,
+  "mae": 1.26,
+  "rmse": 2.21,
+  "r2": 0.044
+}

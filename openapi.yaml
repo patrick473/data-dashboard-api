@@ -118,6 +118,86 @@ components:
         - datetime
         - categorical
 
+    FrequencyEntry:
+      type: object
+      required:
+        - value
+        - count
+        - rate
+      properties:
+        value:
+          type: string
+        count:
+          type: integer
+        rate:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+
+    DistributionBucket:
+      type: object
+      required:
+        - min
+        - max
+        - count
+      properties:
+        min:
+          type: number
+        max:
+          type: number
+        count:
+          type: integer
+
+    DayOfWeekEntry:
+      type: object
+      required:
+        - day
+        - count
+      properties:
+        day:
+          type: string
+          enum:
+            - Monday
+            - Tuesday
+            - Wednesday
+            - Thursday
+            - Friday
+            - Saturday
+            - Sunday
+        count:
+          type: integer
+
+    HourOfDayEntry:
+      type: object
+      required:
+        - hour
+        - count
+      properties:
+        hour:
+          type: integer
+          minimum: 0
+          maximum: 23
+        count:
+          type: integer
+
+    GapStats:
+      type: object
+      required:
+        - min_seconds
+        - max_seconds
+        - mean_seconds
+        - median_seconds
+      properties:
+        min_seconds:
+          type: number
+        max_seconds:
+          type: number
+        mean_seconds:
+          type: number
+        median_seconds:
+          type: number
+
     ColumnStats:
       type: object
       required:
@@ -156,6 +236,11 @@ components:
             - Shl
             - Asd
             - Rtd
+        frequency:
+          type: array
+          items:
+            $ref: "#/components/schemas/FrequencyEntry"
+          description: Top value frequencies (string/categorical columns)
         min:
           type:
             - number
@@ -178,6 +263,64 @@ components:
           type:
             - number
             - "null"
+        q1:
+          type:
+            - number
+            - "null"
+          description: First quartile (numeric columns)
+        q3:
+          type:
+            - number
+            - "null"
+          description: Third quartile (numeric columns)
+        iqr:
+          type:
+            - number
+            - "null"
+          description: Interquartile range (numeric columns)
+        outlier_count:
+          type:
+            - integer
+            - "null"
+          description: Number of outliers (numeric columns)
+        skewness:
+          type:
+            - number
+            - "null"
+          description: Skewness of the distribution (numeric columns)
+        kurtosis:
+          type:
+            - number
+            - "null"
+          description: Kurtosis of the distribution (numeric columns)
+        negative_count:
+          type:
+            - integer
+            - "null"
+          description: Number of negative values (numeric columns)
+        zero_count:
+          type:
+            - integer
+            - "null"
+          description: Number of zero values (numeric columns)
+        distribution:
+          type: array
+          items:
+            $ref: "#/components/schemas/DistributionBucket"
+          description: Histogram buckets (numeric columns)
+        day_of_week:
+          type: array
+          items:
+            $ref: "#/components/schemas/DayOfWeekEntry"
+          description: Row counts per day of week (datetime columns)
+        hour_of_day:
+          type: array
+          items:
+            $ref: "#/components/schemas/HourOfDayEntry"
+          description: Row counts per hour of day (datetime columns)
+        gap_stats:
+          $ref: "#/components/schemas/GapStats"
+          description: Statistics on time gaps between consecutive values (datetime columns)
 
     AnalysisResult:
       type: object

@@ -1,0 +1,10 @@
+{
+  "model": "Random Forest Regressor",
+  "n_estimators": 10,
+  "max_depth": 5,
+  "gemiddelde_vertraging": 0.8,
+  "voorspelling": 0.8,
+  "mae": 1.29,
+  "rmse": 2.28,
+  "r2": 0.018
+}

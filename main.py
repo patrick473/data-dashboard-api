@@ -5,6 +5,7 @@ import pandas as pd
 from fastapi import FastAPI
 
 from routers import data as data_router
+from routers import models as models_router
 
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -25,6 +26,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(data_router.router)
+app.include_router(models_router.router)
 
 
 @app.get("/")

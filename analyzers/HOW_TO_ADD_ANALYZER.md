@@ -47,6 +47,45 @@ ANALYZERS: list[Callable[[pd.DataFrame, Path], dict]] = [
 
 That's it. The pipeline in `analyzeCsvFile.py` calls every function in `ANALYZERS` and merges all results automatically.
 
+### 3. Update the OpenAPI spec
+
+Any new fields your analyzer adds to the output must be reflected in `openapi.yaml` at the root of this repo.
+
+- **New top-level fields** on `AnalysisResult`: add them under `components/schemas/AnalysisResult/properties` (and to `required` if they are always present).
+- **New per-column fields** on `ColumnStats`: add them under `components/schemas/ColumnStats/properties`. Mark them optional (omit from `required`) if they only appear for certain `dtype` values.
+- **New nested objects**: define a new named schema under `components/schemas/` and reference it with `$ref` instead of inlining the shape.
+
+Example — adding a new optional numeric-only field `entropy`:
+
+```yaml
+# in components/schemas/ColumnStats/properties:
+entropy:
+  type:
+    - number
+    - "null"
+  description: Shannon entropy of the value distribution (numeric columns)
+```
+
+Example — adding a new object field that needs its own schema:
+
+```yaml
+# new top-level schema
+MyStats:
+  type: object
+  required:
+    - foo
+    - bar
+  properties:
+    foo:
+      type: integer
+    bar:
+      type: number
+
+# referenced from AnalysisResult or ColumnStats
+my_stats:
+  $ref: "#/components/schemas/MyStats"
+```
+
 ---
 
 ## Shared helpers

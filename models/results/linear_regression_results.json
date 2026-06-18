@@ -1,0 +1,8 @@
+{
+  "model": "Multiple Linear Regression",
+  "gemiddelde_vertraging": 0.85,
+  "voorspelling": 0.85,
+  "mae": 1.25,
+  "rmse": 2.21,
+  "r2": 0.046
+}
