@@ -20,6 +20,59 @@ paths:
                 type: string
               example: "API is working. Visit /docs for API documentation."
 
+  /models/:
+    get:
+      summary: Get available models
+      operationId: getAvailableModels
+      tags:
+        - models
+      responses:
+        "200":
+          description: List of available model names
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AvailableModels"
+
+  /models/{model_name}:
+    get:
+      summary: Get model results
+      operationId: getModelResults
+      tags:
+        - models
+      parameters:
+        - name: model_name
+          in: path
+          required: true
+          description: Model name without the _results suffix (e.g. linear_regression)
+          schema:
+            type: string
+            pattern: "^[A-Za-z0-9_-]+$"
+          example: linear_regression
+      responses:
+        "200":
+          description: Results for the requested model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModelResult"
+        "400":
+          description: Invalid model name
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPError"
+              example:
+                detail: Invalid model name
+        "404":
+          description: Model not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPError"
+              example:
+                detail: Model not found
+
   /data/available-files:
     get:
       summary: Get available files
@@ -86,6 +139,58 @@ components:
             type: string
           example:
             - trein
+
+    AvailableModels:
+      type: object
+      required:
+        - available_models
+      properties:
+        available_models:
+          type: array
+          items:
+            type: string
+          example:
+            - linear_regression
+            - decision_tree
+            - random_forest
+
+    ModelResult:
+      type: object
+      required:
+        - model
+      properties:
+        model:
+          type: string
+          example: Multiple Linear Regression
+        gemiddelde_vertraging:
+          type: number
+          format: float
+          example: 0.85
+        voorspelling:
+          type: number
+          format: float
+          example: 0.85
+        mae:
+          type: number
+          format: float
+          example: 1.25
+        rmse:
+          type: number
+          format: float
+          example: 2.21
+        r2:
+          type: number
+          format: float
+          example: 0.046
+        max_depth:
+          type: integer
+          description: Max depth (decision tree / random forest)
+          example: 5
+        n_estimators:
+          type: integer
+          description: Number of estimators (random forest)
+          example: 10
+
 
     HTTPError:
       type: object
